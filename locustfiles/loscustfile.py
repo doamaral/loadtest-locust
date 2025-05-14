@@ -1,16 +1,20 @@
 from locust import HttpUser, task, between, LoadTestShape
+from faker import Faker
+
+fake = Faker()
 
 
 class MessageLoadTester(HttpUser):
-    wait_time = between(1, 3)
+    wait_time = between(1, 2)
 
     @task
     def send_message(self):
         body = {
-            "message": "Hello, World!"
+            "message": f"Hello, {fake.name()}!"
         }
         response = self.client.post("/log", json=body)
         print(response.status_code, response.text)
+
 
 class CustomLoadShape(LoadTestShape):
     stages = [
@@ -35,4 +39,3 @@ class CustomLoadShape(LoadTestShape):
                 return (stage["users"], stage["spawn_rate"])
         print("🏁 Test Complete - No More Stages")
         return None
-
