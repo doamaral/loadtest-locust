@@ -21,10 +21,15 @@ API will be available at: [http://localhost:8000](http://localhost:8000)
 
 ## Running Tests
 
-//todo
+```bash
+locust -f locustfiles/locustfile.py --users 1 --spawn-rate 1 --run-time 30s --headless --host http://localhost:8000
+```
 
 ## Example Usage
 
 ```bash
 curl -X POST "http://localhost:8000/log" -H "Content-Type: application/json" -d '{"message": "Hello, World!"}'
 ```
+
+## Resources
+- https://docs.locust.io/en/stable/what-is-locust.html
