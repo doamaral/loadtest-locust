@@ -21,6 +21,7 @@ API will be available at: [http://localhost:8000](http://localhost:8000)
 
 ## Running Tests
 
+Test behavior definition using command line
 ```bash
 locust
     --locustfile locustfiles/endurance_test.py
@@ -28,6 +29,11 @@ locust
     --spawn-rate 5
     --run-time 2m
     --host http://localhost:8000 
+```
+
+When all configs are on the locust file, just call it
+```bash
+locust --locustfile locustfiles/customshape_test.py
 ```
 
 ## Example Usage
