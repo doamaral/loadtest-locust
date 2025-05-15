@@ -1,3 +1,4 @@
+import os
 from locust import HttpUser, task, between, LoadTestShape
 from faker import Faker
 
@@ -6,6 +7,7 @@ fake = Faker()
 
 class MessageLoadTester(HttpUser):
     wait_time = between(1, 2)
+    host = os.getenv("HOST", "http://localhost:8000")
 
     @task
     def send_message(self):
