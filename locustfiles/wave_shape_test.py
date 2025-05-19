@@ -1,12 +1,12 @@
 import os
-from locust import HttpUser, task, between, LoadTestShape
+from locust import HttpUser, task, constant, LoadTestShape
 from faker import Faker
 
 fake = Faker()
 
 
 class MessageLoadTester(HttpUser):
-    wait_time = between(1, 2)
+    wait_time = constant(1)
     host = os.getenv("HOST", "http://localhost:8000")
 
     @task
@@ -19,19 +19,21 @@ class MessageLoadTester(HttpUser):
 
 
 class CustomLoadShape(LoadTestShape):
-    stages = [
-        {'duration': 5, 'users': 5, 'spawn_rate': 1},
-        {'duration': 10, 'users': 100, 'spawn_rate': 100},
-        {'duration': 40, 'users': 20, 'spawn_rate': 20},
-        {'duration': 60, 'users': 100, 'spawn_rate': 100},
-        {'duration': 70, 'users': 20, 'spawn_rate': 20},
-        {'duration': 90, 'users': 100, 'spawn_rate': 100},
-        {'duration': 100, 'users': 20, 'spawn_rate': 20},
-        {'duration': 120, 'users': 100, 'spawn_rate': 100},
-        {'duration': 130, 'users': 20, 'spawn_rate': 20},
-        {'duration': 150, 'users': 100, 'spawn_rate': 100}
-    ]
-
+    base_users = int(os.getenv("BASE_USERS", 10))
+    peak_users = int(os.getenv("PEAK_USERS", 500))
+    spawn_rate = int(os.getenv("SPAWN_RATE", 30))
+    peak_duration = int(os.getenv("PEAK_DURATION", 20))
+    base_duration = int(os.getenv("BASE_DURATION", 20))
+    repeat_count = int(os.getenv("REPEAT_COUNT", 10))
+    stages = []
+    
+    if not stages:
+        for i in range(repeat_count):
+            stages.append({"duration": (i * (peak_duration + base_duration)) + base_duration, "users": base_users, "spawn_rate": spawn_rate})
+            stages.append({"duration": (i * (peak_duration + base_duration)) + peak_duration + base_duration, "users": base_users, "spawn_rate": spawn_rate})
+    
+    print(stages)
+#    
     def tick(self):
         run_time = self.get_run_time()
         for i, stage in enumerate(self.stages):
@@ -41,3 +43,4 @@ class CustomLoadShape(LoadTestShape):
                 return (stage["users"], stage["spawn_rate"])
         print("🏁 Test Complete - No More Stages")
         return None
+    
