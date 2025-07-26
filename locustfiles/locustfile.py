@@ -1,10 +1,29 @@
-from locust import HttpUser, task, between, LoadTestShape
+from locust import HttpUser, task, between, events, LoadTestShape
+from generate_token import TokenManager
 from faker import Faker
 
 fake = Faker()
 
+tokenGen = TokenManager()
+
+
+@events.test_start.add_listener
+def on_test_start(environment, **kwargs):
+    """
+    This runs ONCE before any user/task starts executing.
+    Ideal for shared setup: token generation, data seeding, etc.
+    """
+    token = tokenGen.retrieve_token()
+    print(f"######## Hello World {token} ##################")
+
 
 class MessageLoadTester(HttpUser):
+    def on_start(self):
+        """
+        This runs ONCE before each user starts executing.
+        """
+        print("## Hello World ##")
+
     wait_time = between(1, 2)
 
     @task
